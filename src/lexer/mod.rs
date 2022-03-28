@@ -45,7 +45,7 @@ impl Iterator for Lexer {
                 _ => Err(format!("Invalid Integer: {}", t.as_str())),
             }
         }
-        else if let Some(t) = Regex::new(r#"^'[^']*'"#).unwrap().find(text.as_str()) {
+        else if let Some(t) = Regex::new(r#"^"[^"]*""#).unwrap().find(text.as_str()) {
             let mut s: String = String::new();
             for _ in 0..t.end() {
                 s.push(self.raw_data.next().unwrap());
