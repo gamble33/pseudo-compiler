@@ -5,6 +5,7 @@ use crate::Result;
 
 use std::iter::Peekable;
 use std::vec::IntoIter;
+use regex::Regex;
 
 pub struct Lexer {
     raw_data: Peekable<IntoIter<char>>,
@@ -14,8 +15,13 @@ impl Iterator for Lexer {
     type Item = Result<Token>; 
     fn next(&mut self) -> Option<Self::Item> {
         let token: Self::Item;
-
         let first_char: char;
+        let mut text: String = String::new();
+
+        // TODO: Stop cloning String, allow regex expression matching with &str slice.
+        for c in self.raw_data.clone().collect::<Vec<char>>() {
+            text.push(c);
+        }
 
         loop {
             match self.raw_data.next() {
@@ -28,56 +34,31 @@ impl Iterator for Lexer {
             }
         }
 
-        // Identifier or Keyword
-        if Self::is_identifier(first_char) && !first_char.is_numeric() {
-            let mut name: String = first_char.to_string();
-            self.get_next_char_while(&mut name, Self::is_identifier);
+        println!("first_char: {}\ntext: {}",first_char, text);
 
-            if KEYWORDS.contains(&&name[..]) {
-                token = Ok(Token::Keyword(name));
-            } else {
-                token = Ok(Token::Identifier(name));
+        if let Some(t) = Regex::new(r#"^\d+"#).unwrap().find(text.as_str()) {
+            for _ in 0..t.end() {
+                self.raw_data.next();
             }
-        }  
-
-        // Literal
-        else if first_char.is_numeric() {
-            let mut value: String = first_char.to_string();
-            self.get_next_char_while(&mut value, |c| c.is_numeric());
-            token = match value.parse::<i32>() {
+            let value = t.as_str().parse::<i32>();
+            token = match value {
                 Ok(i) => Ok(Token::Literal(Literal::Integer(i))),
-                Err(_) => Err(format!("Integer literal {} is invalid", value)),
-            };
-        } 
-        
-        // Symbol
-        else {
-            let mut symbol: String = first_char.to_string();
-            loop {
-                if let Some(peek) = self.raw_data.peek() {
-                    symbol.push(*peek);
-                } else {
-                    break;
-                }
-
-                if VALID_SYMBOLS.contains(&&symbol[..]) {
-                    self.raw_data.next();
-                } else {
-                    symbol.pop();
-                    break;
-                }
+                _ => Err(format!("Invalid Integer: {}", t.as_str())),
             }
-
-            token = match &symbol[..] {
-                s if s == "//" => {
-                    self.get_next_char_while(&mut String::new(), |c| c != '\n');
-                    self.next()?
-                },
-                s if VALID_SYMBOLS.contains(&s) => Ok(Token::Symbol(symbol)),
-                _ => Err(format!("Unkown token: {}", symbol)),
-            };
         }
-
+          // TODO: Add suport for new lines
+        else if let Some(t) = Regex::new(r#"^'[^']*'"#).unwrap().find(text.as_str()) {
+            let mut s: String = first_char.to_string();
+            for _ in 0..t.end() {
+                s.push(self.raw_data.next().unwrap());
+            }
+            println!("str: {}", s);
+            let s = &s[1..s.len()-2];
+            token = Ok(Token::Literal(Literal::Str(s.to_owned())));
+        }
+        else {
+            token = Err(format!("Unexpected Token: {}", first_char));
+        }
         Some(token)
     }
 }
@@ -85,28 +66,11 @@ impl Iterator for Lexer {
 impl Lexer {
     pub fn from_text(text: &str) -> Self {
         Lexer {
-            raw_data: text.chars().collect::<Vec<_>>().into_iter().peekable(),
+            raw_data: text.chars().collect::<Vec<char>>().into_iter().peekable()
         }
     }
 
     pub fn from_file(path: &str) -> std::io::Result<Self> {
         Ok(Self::from_text(&std::fs::read_to_string(path)?))
-    }
-
-    fn get_next_char_while(&mut self, raw_token: &mut String, condition: fn(char) -> bool) {
-        loop {
-            match self.raw_data.peek() {
-                Some(c) if condition(*c) => {
-                    raw_token.push(*c);
-                    self.raw_data.next();
-                },
-                _ => break,
-            }
-        }
-    }
-
-    // Variable & function names (identifiers) can only be alphanumeric characters.
-    fn is_identifier(c: char) -> bool {
-        c.is_ascii_alphanumeric()
     }
 }
