@@ -15,26 +15,25 @@ impl Iterator for Lexer {
     type Item = Result<Token>; 
     fn next(&mut self) -> Option<Self::Item> {
         let token: Self::Item;
-        let first_char: char;
         let mut text: String = String::new();
 
-        // TODO: Stop cloning String, allow regex expression matching with &str slice.
-        for c in self.raw_data.clone().collect::<Vec<char>>() {
-            text.push(c);
-        }
-
         loop {
-            match self.raw_data.next() {
-                Some(c) if c.is_whitespace() => continue,
-                Some(c) => {
-                    first_char = c;
+            match self.raw_data.peek() {
+                Some(c) if c.is_whitespace() => {
+                    self.raw_data.next();
+                    continue;
+                },
+                Some(_) => {
                     break;
                 }
                 None => return None,
             }
         }
 
-        println!("first_char: {}\ntext: {}",first_char, text);
+        // TODO: Stop cloning String, allow regex expression matching with &str slice.
+        for c in self.raw_data.clone().collect::<Vec<char>>() {
+            text.push(c);
+        }
 
         if let Some(t) = Regex::new(r#"^\d+"#).unwrap().find(text.as_str()) {
             for _ in 0..t.end() {
@@ -46,18 +45,17 @@ impl Iterator for Lexer {
                 _ => Err(format!("Invalid Integer: {}", t.as_str())),
             }
         }
-          // TODO: Add suport for new lines
         else if let Some(t) = Regex::new(r#"^'[^']*'"#).unwrap().find(text.as_str()) {
-            let mut s: String = first_char.to_string();
+            let mut s: String = String::new();
             for _ in 0..t.end() {
                 s.push(self.raw_data.next().unwrap());
             }
             println!("str: {}", s);
-            let s = &s[1..s.len()-2];
+            let s = &s[1..s.len()-1];
             token = Ok(Token::Literal(Literal::Str(s.to_owned())));
         }
         else {
-            token = Err(format!("Unexpected Token: {}", first_char));
+            token = Err(format!("Unexpected Token: {}", self.raw_data.next().unwrap()));
         }
         Some(token)
     }
