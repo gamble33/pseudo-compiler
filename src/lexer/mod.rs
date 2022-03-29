@@ -54,7 +54,6 @@ impl Iterator for Lexer {
             for _ in 0..t.end() {
                 s.push(self.raw_data.next().unwrap());
             }
-            println!("str: {}", s);
             let s = &s[1..s.len()-1];
             token = Ok(Token::Literal(Literal::Str(s.to_owned())));
         }
