@@ -20,4 +20,8 @@ impl Parser {
             tokens,
         }
     }
+
+    pub fn parse_program() {
+        unimplemented!();
+    }
 }

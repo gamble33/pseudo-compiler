@@ -58,6 +58,12 @@ impl Iterator for Lexer {
             let s = &s[1..s.len()-1];
             token = Ok(Token::Literal(Literal::Str(s.to_owned())));
         }
+        else if let Some(t) = Regex::new(r#"^//.*"#).unwrap().find(text.as_str()){
+            for _ in 0..t.end() {
+                self.raw_data.next().unwrap();
+            }
+            token = self.next()?;
+        }
         else {
             token = Err(format!("Unexpected Token: {}", self.raw_data.next().unwrap()));
         }
