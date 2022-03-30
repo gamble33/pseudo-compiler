@@ -1,4 +1,4 @@
-//! Front-End Compiler for Cambdridge's psuedo-code.
+//! Front-End Compiler for Cambridge's pseudo-code.
 
 pub mod lexer;
 pub mod parser;
