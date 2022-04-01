@@ -20,7 +20,6 @@ impl Iterator for Lexer {
     fn next(&mut self) -> Option<Self::Item> {
         let token: Self::Item;
         let mut text: String = String::new();
-        let first_char: &char;
 
         loop {
             match self.raw_data.peek() {
@@ -28,8 +27,7 @@ impl Iterator for Lexer {
                     self.raw_data.next();
                     continue;
                 }
-                Some(c) => {
-                    first_char = c;
+                Some(_) => {
                     break;
                 }
                 None => return None,
