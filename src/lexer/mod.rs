@@ -82,7 +82,7 @@ impl Iterator for Lexer {
         else if let Some(t) = Regex::new(r#"^[_a-zA-Z][_a-zA-Z0-9]*"#).unwrap().find(text.as_str()) {
             let mut s: String = String::new();
             for _ in 0..t.end() {
-                self.raw_data.next().unwrap();
+                s.push(self.raw_data.next().unwrap());
             }
             token = Ok(Token::Identifier(s));
         }
