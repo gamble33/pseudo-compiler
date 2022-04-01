@@ -24,7 +24,10 @@ impl Parser {
             _ => return Err(String::from("Expected symbol: '<-'.")),
         };
 
-        let value: Expression = self.parse_expression();
+        let value: Expression = match self.parse_expression() {
+            Ok(expr) => expr,
+            Err(err) => return Err(err),
+        };
 
         Ok(Statement::VariableAssignment {
             identifier,
