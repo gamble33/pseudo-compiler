@@ -16,18 +16,20 @@ pub struct Lexer {
 }
 
 impl Iterator for Lexer {
-    type Item = Result<Token>; 
+    type Item = Result<Token>;
     fn next(&mut self) -> Option<Self::Item> {
         let token: Self::Item;
         let mut text: String = String::new();
+        let first_char: &char;
 
         loop {
             match self.raw_data.peek() {
                 Some(c) if c.is_whitespace() => {
                     self.raw_data.next();
                     continue;
-                },
-                Some(_) => {
+                }
+                Some(c) => {
+                    first_char = c;
                     break;
                 }
                 None => return None,
@@ -39,6 +41,7 @@ impl Iterator for Lexer {
             text.push(c);
         }
 
+        // Integer Literal
         if let Some(t) = Regex::new(r#"^\d+"#).unwrap().find(text.as_str()) {
             for _ in 0..t.end() {
                 self.raw_data.next();
@@ -49,23 +52,46 @@ impl Iterator for Lexer {
                 _ => Err(format!("Invalid Integer: {}", t.as_str())),
             }
         }
+
+        // String Literals
         else if let Some(t) = Regex::new(r#"^"[^"]*""#).unwrap().find(text.as_str()) {
             let mut s: String = String::new();
             for _ in 0..t.end() {
                 s.push(self.raw_data.next().unwrap());
             }
-            let s = &s[1..s.len()-1];
+            let s = &s[1..s.len() - 1];
             token = Ok(Token::Literal(Literal::Str(s.to_owned())));
         }
-        else if let Some(t) = Regex::new(r#"^//.*"#).unwrap().find(text.as_str()){
+
+        // Comments
+        else if let Some(t) = Regex::new(r#"^//.*"#).unwrap().find(text.as_str()) {
             for _ in 0..t.end() {
                 self.raw_data.next().unwrap();
             }
             token = self.next()?;
         }
+
+        // Symbols
+        else if let Some(t) = Regex::new(r#"^(<-|=)"#).unwrap().find(text.as_str()) {
+            let mut s: String = String::new();
+            for _ in 0..t.end() {
+                s.push(self.raw_data.next().unwrap());
+            }
+            token = Ok(Token::Symbol(s));
+        }
+
+        // Identifiers
+        else if let Some(t) = Regex::new(r#"^[_a-zA-Z][_a-zA-Z0-9]*"#).unwrap().find(text.as_str()) {
+            let mut s: String = String::new();
+            for _ in 0..t.end() {
+                self.raw_data.next().unwrap();
+            }
+            token = Ok(Token::Identifier(s));
+        }
         else {
             token = Err(format!("Unexpected Token: {}", self.raw_data.next().unwrap()));
         }
+        println!("{:?}", Some(&token));
         Some(token)
     }
 }

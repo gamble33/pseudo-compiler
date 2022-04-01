@@ -1,7 +1,13 @@
+pub mod expression;
+pub mod statement;
+
+use crate::parser::expression::Expression;
 use crate::lexer::tokens::Token;
 
+use crate::Result;
 use std::iter::Peekable;
 use std::vec::IntoIter;
+use crate::parser::statement::Statement;
 
 type TokenIter = Peekable<IntoIter<Token>>;
 
@@ -21,7 +27,10 @@ impl Parser {
         }
     }
 
-    pub fn parse_program() {
-        unimplemented!();
+    pub fn parse(&mut self) -> Result<Statement> {
+        self.parse_statement()
     }
 }
+
+
+
