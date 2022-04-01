@@ -12,7 +12,6 @@ fn main() {
         .filter_map(|t| match t.token_kind {
             Ok(_) => Some(t),
             Err(err) => {
-                // TODO: Add line number to error
                 println!("{}, {}:{}:{}", err, source_path, t.line_number, t.column_number);
                 std::process::exit(1);
             }

@@ -34,6 +34,7 @@ impl Iterator for Lexer {
             match self.raw_data.peek() {
                 Some(c) if *c == ' ' => {
                     self.raw_data.next();
+                    self.column_count += 1;
                     continue;
                 }
                 Some(c) => {
@@ -68,7 +69,7 @@ impl Iterator for Lexer {
         }
 
         // String Literals
-        else if let Some(t) = Regex::new(r#"^"[^"]*""#).unwrap().find(text.as_str()) {
+        else if let Some(t) = Regex::new(r#"^"[^"\r\n]*""#).unwrap().find(text.as_str()) {
             let mut s: String = String::new();
             self.eat_and_read_chars(Some(&mut s), t.end());
             let s = &s[1..s.len() - 1];
@@ -98,7 +99,6 @@ impl Iterator for Lexer {
             token_kind = Err(format!("Unexpected Token: '{}'", self.raw_data.next().unwrap()));
         }
 
-        println!("{:?}", Some(&token_kind));
         token = Token::new(token_kind, self.line_count, self.column_count);
         Some(token)
     }
