@@ -1,5 +1,8 @@
 use crate::Result;
 
+/// Token struct contains [`token kind`] and meta data about the token
+///
+/// [`token kind`]: crate::lexer::tokens::TokenKind
 #[derive(Debug)]
 pub struct Token {
     pub token_kind: Result<TokenKind>,

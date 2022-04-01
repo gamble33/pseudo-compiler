@@ -7,10 +7,11 @@ use std::iter::Peekable;
 use std::vec::IntoIter;
 use regex::Regex;
 
-/// Lexer (or tokenizer) which creates a list of tokens defined in the [`Token`] enum
+/// Lexer (or tokenizer) which creates a list of [`Token`]s defined in the [`TokenKind`] enum
 /// by implementing the Iterator trait
 ///
-/// [`Token`]: ./tokens/enum.Token.html
+/// [`Token`]: crate::lexer::tokens::Token
+/// [`TokenKind`]: crate::lexer::tokens::TokenKind
 pub struct Lexer {
     raw_data: Peekable<IntoIter<char>>,
     line_count: u32,
