@@ -3,12 +3,14 @@ use crate::Result;
 #[derive(Debug)]
 pub struct Token {
     pub token_kind: Result<TokenKind>,
+    pub line_number: u32,
 }
 
 impl Token {
-    pub fn new(token_kind: Result<TokenKind>) -> Token {
+    pub fn new(token_kind: Result<TokenKind>, line_number: u32) -> Token {
         Token {
-            token_kind
+            token_kind,
+            line_number
         }
     }
 }
@@ -18,7 +20,8 @@ pub enum TokenKind {
     Identifier(String),
     Keyword(String),
     Literal(Literal),
-    Symbol(String)
+    Symbol(String),
+    EndLine,
 }
 
 #[derive(Debug)]

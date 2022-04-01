@@ -13,6 +13,7 @@ use regex::Regex;
 /// [`Token`]: ./tokens/enum.Token.html
 pub struct Lexer {
     raw_data: Peekable<IntoIter<char>>,
+    line_count: u32,
 }
 
 impl Iterator for Lexer {
@@ -25,7 +26,7 @@ impl Iterator for Lexer {
 
         loop {
             match self.raw_data.peek() {
-                Some(c) if c.is_whitespace() => {
+                Some(c) if *c == ' ' => {
                     self.raw_data.next();
                     continue;
                 }
@@ -41,8 +42,17 @@ impl Iterator for Lexer {
             text.push(c);
         }
 
+        // End Line
+        if let Some(t) = Regex::new(r#"^[\r\n]"#).unwrap().find(text.as_str()) {
+            for _ in 0..t.end() {
+                self.raw_data.next();
+            }
+            token_kind = Ok(TokenKind::EndLine);
+            self.line_count += 1;
+        }
+
         // Integer Literal
-        if let Some(t) = Regex::new(r#"^\d+"#).unwrap().find(text.as_str()) {
+        else if let Some(t) = Regex::new(r#"^\d+"#).unwrap().find(text.as_str()) {
             for _ in 0..t.end() {
                 self.raw_data.next();
             }
@@ -89,10 +99,11 @@ impl Iterator for Lexer {
             token_kind = Ok(TokenKind::Identifier(s));
         }
         else {
-            token_kind = Err(format!("Unexpected Token: {}", self.raw_data.next().unwrap()));
+            token_kind = Err(format!("Unexpected Token: '{}'", self.raw_data.next().unwrap()));
         }
+
         println!("{:?}", Some(&token_kind));
-        token = Token::new(token_kind);
+        token = Token::new(token_kind, self.line_count);
         Some(token)
     }
 }
@@ -100,7 +111,8 @@ impl Iterator for Lexer {
 impl Lexer {
     pub fn from_text(text: &str) -> Self {
         Lexer {
-            raw_data: text.chars().collect::<Vec<char>>().into_iter().peekable()
+            raw_data: text.chars().collect::<Vec<char>>().into_iter().peekable(),
+            line_count: 1u32,
         }
     }
 
