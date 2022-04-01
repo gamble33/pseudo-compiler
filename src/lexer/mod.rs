@@ -96,7 +96,7 @@ impl Iterator for Lexer {
             self.eat_and_read_chars(Some(&mut s), t.end());
             token_kind = Ok(TokenKind::Identifier(s));
         } else {
-            token_kind = Err(format!("Unexpected Token: '{}'", self.raw_data.next().unwrap()));
+            token_kind = Err(format!("Unexpected Token: `{}`", self.raw_data.next().unwrap()));
         }
 
         token = Token::new(token_kind, self.line_count, self.column_count);
