@@ -50,7 +50,6 @@ impl Iterator for Lexer {
 
         // End Line
         if let Some(t) = Regex::new(r#"^((\r\n)|\n)"#).unwrap().find(text.as_str()) {
-            self.raw_data.next();
             self.eat_and_read_chars(None, t.end());
             token_kind = Ok(TokenKind::EndLine);
             self.line_count += 1;
@@ -58,14 +57,13 @@ impl Iterator for Lexer {
         }
 
         // Integer Literal
-        else if let Some(t) = Regex::new(r#"^\d+"#).unwrap().find(text.as_str()) {
-            self.raw_data.next();
+        else if let Some(t) = Regex::new(r#"^\d+ "#).unwrap().find(text.as_str()) {
             let mut s: String = String::new();
             self.eat_and_read_chars(Some(&mut s), t.end());
             let value = s.as_str().parse::<i32>();
             token_kind = match value {
                 Ok(i) => Ok(TokenKind::Literal(Literal::Integer(i))),
-                _ => Err(format!("Invalid Integer: {}", t.as_str())),
+                Err(err) => Err(format!("Invalid Integer: {}, {}", t.as_str(), err)),
             }
         }
 
