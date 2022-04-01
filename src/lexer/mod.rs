@@ -58,7 +58,7 @@ impl Iterator for Lexer {
         }
 
         // Integer Literal
-        else if let Some(t) = Regex::new(r#"^\d+ "#).unwrap().find(text.as_str()) {
+        else if let Some(t) = Regex::new(r#"^\d+"#).unwrap().find(text.as_str()) {
             let mut s: String = String::new();
             self.eat_and_read_chars(Some(&mut s), t.end());
             let value = s.as_str().parse::<i32>();
