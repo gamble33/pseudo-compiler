@@ -13,7 +13,7 @@ fn main() {
             Ok(_) => Some(t),
             Err(err) => {
                 // TODO: Add line number to error
-                println!("{}, {}:{}", err, source_path, t.line_number);
+                println!("{}, {}:{}:{}", err, source_path, t.line_number, t.column_number);
                 std::process::exit(1);
             }
         })

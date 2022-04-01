@@ -7,13 +7,28 @@ use crate::Result;
 pub struct Token {
     pub token_kind: Result<TokenKind>,
     pub line_number: u32,
+    pub column_number: u32,
 }
 
 impl Token {
-    pub fn new(token_kind: Result<TokenKind>, line_number: u32) -> Token {
+    pub fn new(token_kind: Result<TokenKind>, line_number: u32, column_number: u32) -> Token {
         Token {
             token_kind,
-            line_number
+            line_number,
+            column_number,
+        }
+    }
+
+    /// Intended for writing tests and debugging.
+    /// Creates a Token from the [`TokenKind`] enum and sets all other
+    /// fields to default values.
+    ///
+    /// [`TokenKind`]: crate::lexer::tokens::TokenKind
+    pub fn from_kind(token_kind: TokenKind) -> Token {
+        Token {
+            token_kind: Ok(token_kind),
+            line_number: 0,
+            column_number: 0,
         }
     }
 }
