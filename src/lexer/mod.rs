@@ -44,7 +44,7 @@ impl Iterator for Lexer {
         }
 
         // End Line
-        if let Some(t) = Regex::new(r#"^[\r\n]"#).unwrap().find(text.as_str()) {
+        if let Some(t) = Regex::new(r#"^((\r\n)|\n)"#).unwrap().find(text.as_str()) {
             for _ in 0..t.end() {
                 self.raw_data.next();
             }

@@ -1,3 +1,4 @@
+use peek_nth::IteratorExt;
 use pseudo_compiler::lexer::Lexer;
 use pseudo_compiler::parser::Parser;
 
@@ -18,7 +19,7 @@ fn main() {
         })
         .collect::<Vec<_>>()
         .into_iter()
-        .peekable();
+        .peekable_nth();
 
     // Syntax Analysis
     let mut parser: Parser = Parser::new(tokens);

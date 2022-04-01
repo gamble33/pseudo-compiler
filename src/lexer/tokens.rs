@@ -27,6 +27,10 @@ pub enum TokenKind {
     EndLine,
 }
 
+/// # Grammar
+/// \<literal\> ::=
+///     " {\<character\>} "
+///     | {\<digit\>}
 #[derive(Debug)]
 pub enum Literal {
     Integer(i32),

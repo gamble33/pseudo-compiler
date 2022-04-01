@@ -16,5 +16,8 @@ impl Parser {
 
 #[derive(Debug)]
 pub enum Expression {
+    /// See grammar [`here`]
+    ///
+    /// [`here`]: crate::lexer::tokens::Literal
     Literal { value: Literal},
 }
