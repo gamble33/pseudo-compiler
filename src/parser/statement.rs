@@ -7,6 +7,10 @@ use crate::Result;
 impl Parser {
     pub fn parse_statement(&mut self) -> Result<Statement> {
         match self.tokens.peek() {
+            Some( Token { token_kind: Ok(TokenKind::EndLine), .. }) => {
+                self.tokens.next();
+                self.parse_statement()
+            }
             _ => self.parse_variable_assignment(),
         }
     }
