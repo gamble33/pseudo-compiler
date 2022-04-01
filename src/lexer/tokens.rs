@@ -1,5 +1,20 @@
+use crate::Result;
+
 #[derive(Debug)]
-pub enum Token {
+pub struct Token {
+    pub token_kind: Result<TokenKind>,
+}
+
+impl Token {
+    pub fn new(token_kind: Result<TokenKind>) -> Token {
+        Token {
+            token_kind
+        }
+    }
+}
+
+#[derive(Debug)]
+pub enum TokenKind {
     Identifier(String),
     Keyword(String),
     Literal(Literal),

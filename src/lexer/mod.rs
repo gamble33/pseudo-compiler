@@ -16,9 +16,11 @@ pub struct Lexer {
 }
 
 impl Iterator for Lexer {
-    type Item = Result<Token>;
+    type Item = Token;
     fn next(&mut self) -> Option<Self::Item> {
-        let token: Self::Item;
+        let token: Token;
+        let token_kind: Result<TokenKind>;
+
         let mut text: String = String::new();
 
         loop {
@@ -45,8 +47,8 @@ impl Iterator for Lexer {
                 self.raw_data.next();
             }
             let value = t.as_str().parse::<i32>();
-            token = match value {
-                Ok(i) => Ok(Token::Literal(Literal::Integer(i))),
+            token_kind = match value {
+                Ok(i) => Ok(TokenKind::Literal(Literal::Integer(i))),
                 _ => Err(format!("Invalid Integer: {}", t.as_str())),
             }
         }
@@ -58,7 +60,7 @@ impl Iterator for Lexer {
                 s.push(self.raw_data.next().unwrap());
             }
             let s = &s[1..s.len() - 1];
-            token = Ok(Token::Literal(Literal::Str(s.to_owned())));
+            token_kind = Ok(TokenKind::Literal(Literal::Str(s.to_owned())));
         }
 
         // Comments
@@ -66,7 +68,7 @@ impl Iterator for Lexer {
             for _ in 0..t.end() {
                 self.raw_data.next().unwrap();
             }
-            token = self.next()?;
+            token_kind = self.next()?.token_kind;
         }
 
         // Symbols
@@ -75,7 +77,7 @@ impl Iterator for Lexer {
             for _ in 0..t.end() {
                 s.push(self.raw_data.next().unwrap());
             }
-            token = Ok(Token::Symbol(s));
+            token_kind = Ok(TokenKind::Symbol(s));
         }
 
         // Identifiers
@@ -84,12 +86,13 @@ impl Iterator for Lexer {
             for _ in 0..t.end() {
                 s.push(self.raw_data.next().unwrap());
             }
-            token = Ok(Token::Identifier(s));
+            token_kind = Ok(TokenKind::Identifier(s));
         }
         else {
-            token = Err(format!("Unexpected Token: {}", self.raw_data.next().unwrap()));
+            token_kind = Err(format!("Unexpected Token: {}", self.raw_data.next().unwrap()));
         }
-        println!("{:?}", Some(&token));
+        println!("{:?}", Some(&token_kind));
+        token = Token::new(token_kind);
         Some(token)
     }
 }

@@ -1,5 +1,6 @@
 use crate::parser::Parser;
 use crate::parser::expression::Expression;
+use crate::lexer::tokens::TokenKind;
 use crate::lexer::tokens::Token;
 use crate::Result;
 
@@ -12,12 +13,13 @@ impl Parser {
 
     pub fn parse_variable_assignment(&mut self) -> Result<Statement> {
         let identifier = match self.tokens.next() {
-            Some(Token::Identifier(id)) => id,
-            t => return Err(format!("Expected token identifier, found: {:?}.", t)),
+            Some( Token { token_kind: Ok(TokenKind::Identifier(s)), .. }) => s,
+            Some(t) => return Err(format!("Expected token identifier, found: {:?}.", t.token_kind)),
+            _ => return Err(String::from("Expected token identifier, found: EOF.")),
         };
 
         match self.tokens.peek() {
-            Some(Token::Symbol(s)) => match s.as_str() {
+            Some( Token{ token_kind: Ok(TokenKind::Symbol(s)), .. }) => match s.as_str() {
                 "<-" => self.tokens.next(),
                 _ => return Err(format!("Expected symbol: '<-', found: '{}'", s)),
             },

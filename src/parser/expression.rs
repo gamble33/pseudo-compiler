@@ -1,5 +1,5 @@
 use crate::parser::Parser;
-use crate::lexer::tokens::Token;
+use crate::lexer::tokens::TokenKind;
 use crate::lexer::tokens::Literal;
 use crate::Result;
 
