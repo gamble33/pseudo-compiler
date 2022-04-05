@@ -10,14 +10,22 @@ fn main() {
     });
     let mut exit_due_to_err: bool = false;
 
- 
+
     // Lexical Analysis
     let lexer: Lexer = Lexer::from_text(&src);
     let tokens = lexer
-        .filter_map(|t| match t.clone().token_kind {
-                Ok(_) => Some(t),
+        .filter_map(|t| match t.token_kind {
+            Ok(_) => Some(t),
             Err(err) => {
-                pseudo_compiler::print_error(Some(&t), &err, &src, source_path);
+                pseudo_compiler::print_error(
+                    &err,
+                    &source_path,
+                    Some(pseudo_compiler::ErrorInfo::new(
+                        &src,
+                        t.line_number,
+                        t.column_number,
+                    )),
+                );
                 exit_due_to_err = true;
                 None
             }
