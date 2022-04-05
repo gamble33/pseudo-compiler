@@ -3,7 +3,7 @@ use crate::Result;
 /// Token struct contains [`token kind`] and meta data about the token
 ///
 /// [`token kind`]: crate::lexer::tokens::TokenKind
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     pub token_kind: Result<TokenKind>,
     pub line_number: u32,
@@ -33,7 +33,7 @@ impl Token {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum TokenKind {
     Identifier(String),
     Keyword(String),
@@ -46,7 +46,7 @@ pub enum TokenKind {
 /// \<literal\> ::=
 ///     " {\<character\>} "
 ///     | {\<digit\>}
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Literal {
     Integer(i32),
     Str(String),
