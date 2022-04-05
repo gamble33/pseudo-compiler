@@ -37,7 +37,7 @@ impl Iterator for Lexer {
                     self.column_count += 1;
                     continue;
                 }
-                Some(c) => {
+                Some(_) => {
                     break;
                 }
                 None => return None,

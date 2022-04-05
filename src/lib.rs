@@ -12,10 +12,11 @@ pub type Result<T> = std::result::Result<T, String>;
 /// [`Token`]: crate::lexer::tokens::Token
 pub fn print_error(token: Option<&crate::lexer::tokens::Token>, message: &str, src: &str, src_path: &str) {
     if let Some(t) = token {
-        println!("| {}", src.lines().enumerate().find(|line| line.0 == (t.line_number - 1) as usize).unwrap().1);
+        let number_space: String = whitespace_string((t.line_number.to_string().len() + 2) as u32);
+        println!("{} | {}", t.line_number, src.lines().enumerate().find(|line| line.0 == (t.line_number - 1) as usize).unwrap().1);
         let space_buf: String = whitespace_string(t.column_number);
-        println!("| {}^", space_buf);
-        println!("| {}, {}:{}:{}", message, src_path, t.line_number, t.column_number);
+        println!("{}| {}^", number_space, space_buf);
+        println!("{}| {}, {}:{}:{}", number_space, message, src_path, t.line_number, t.column_number);
     } else {
         println!("| {}, {}", message, src_path);
     }
