@@ -3,9 +3,9 @@ use pseudo_compiler::lexer::Lexer;
 use pseudo_compiler::parser::Parser;
 
 fn main() {
-    let source_path = "test.pseudo";
-    let src = std::fs::read_to_string(source_path).unwrap_or_else(|e| {
-        println!("File Error: {}, (path: {})", e, source_path);
+    let src_path = "test.pseudo";
+    let src = std::fs::read_to_string(src_path).unwrap_or_else(|e| {
+        println!("File Error: {}, (path: {})", e, src_path);
         std::process::exit(1);
     });
     let mut exit_due_to_err: bool = false;
@@ -19,7 +19,7 @@ fn main() {
             Err(err) => {
                 pseudo_compiler::print_error(
                     &err,
-                    &source_path,
+                    &src_path,
                     Some(pseudo_compiler::ErrorInfo::new(
                         &src,
                         t.line_number,
