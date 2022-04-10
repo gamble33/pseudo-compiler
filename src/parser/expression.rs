@@ -5,10 +5,17 @@ use crate::Result;
 
 impl Parser {
     /// \<expression\> ::= <term> + <term> | <term>
-    ///
     pub fn parse_expression(&mut self) -> Result<Expression> {
         // TODO: Parse expressions
         self.parse_literal()
+    }
+
+    pub fn parse_unary(&mut self) -> Result<Expression> {
+        unimplemented!()
+    }
+
+    pub fn parse_binary(&mut self) -> Result<Expression> {
+        unimplemented!()
     }
 
     pub fn parse_literal(&mut self) -> Result<Expression> {
