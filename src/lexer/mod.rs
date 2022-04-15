@@ -5,6 +5,8 @@ use crate::Result;
 
 use std::iter::Peekable;
 use std::vec::IntoIter;
+
+// TODO: Don't use regex
 use regex::Regex;
 
 /// Lexer (or tokenizer) which creates a list of [`Token`]s defined in the [`TokenKind`] enum
